@@ -57,8 +57,7 @@ def predict(question, search_method, top_k, max_token, temperature, top_p, knn_b
 
 if __name__ == "__main__":
     title = """
-    # Elasticsearch + ChatGLM demo
-    [https://github.com/iMagist486/ElasticSearch-Langchain-Chatglm2](https://github.com/iMagist486/ElasticSearch-Langchain-Chatglm2)
+    # Langchain-Elasticsearch
     """
     with gr.Blocks() as demo:
         gr.Markdown(title)
