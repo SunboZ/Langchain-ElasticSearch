@@ -7,6 +7,7 @@ from langchain.text_splitter import CharacterTextSplitter
 from configs.params import ESParams
 from embedding import Embeddings
 from typing import Dict
+from langchain.vectorstores import ElasticsearchStore, ElasticVectorSearch
 
 
 def _default_knn_mapping(dims: int) -> Dict:
@@ -94,8 +95,9 @@ class ES:
                                     basic_auth=(self.es_params.username, self.es_params.passwd),
                                     verify_certs=False)
         self.embedding = Embeddings(embedding_model_path)
-        self.es = ElasticKnnSearch(index_name=self.es_params.index_name, embedding=self.embedding,
-                                   es_connection=self.client)
+        # self.es = ElasticKnnSearch(index_name=self.es_params.index_name, embedding=self.embedding,
+        #                            es_connection=self.client)
+        self.es = ElasticVectorSearch(index_name=self.es_params.index_name, embedding=self.embedding, elasticsearch_url="http://localhost:9200")
 
     def doc_upload(self, file_obj, chunk_size, chunk_overlap):
         try:
