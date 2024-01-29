@@ -36,8 +36,8 @@ class ChatLLM(LLM):
             self.model = self.model.eval()
             self.model_type = "InternLM"
         elif "qwen" in self.model_path.lower():
-            self.tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen-14B-Chat", trust_remote_code=True)
-            self.model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen-14B-Chat", device_map="auto",
+            self.tokenizer = AutoTokenizer.from_pretrained(self.model_path, trust_remote_code=True)
+            self.model = AutoModelForCausalLM.from_pretrained(self.model_path, device_map="auto",
                                                          trust_remote_code=True).eval()
             self.model_type = "Qwen"
         else:
