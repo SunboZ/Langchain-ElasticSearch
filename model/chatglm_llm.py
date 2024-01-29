@@ -1,5 +1,6 @@
 from typing import Optional, List
 import torch
+from accelerate import disk_offload
 from transformers import AutoModel, AutoTokenizer, AutoModelForCausalLM
 from langchain.llms.base import LLM
 from model.base import AnswerResult
@@ -38,7 +39,8 @@ class ChatLLM(LLM):
         elif "qwen" in self.model_path.lower():
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_path, trust_remote_code=True)
             self.model = AutoModelForCausalLM.from_pretrained(self.model_path, device_map="auto",
-                                                         trust_remote_code=True).eval()
+                                                         trust_remote_code=True).cuda()
+            self.model.eval()
             self.model_type = "Qwen"
         else:
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_path, trust_remote_code=True)
