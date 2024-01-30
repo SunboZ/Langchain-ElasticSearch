@@ -101,7 +101,7 @@ class ChatLLM(LLM):
                 temperature=self.temperature,
                 top_p=self.top_p
             )
-            self.clear_torch_cache()
+            # self.clear_torch_cache()
             history += [[prompt, response]]
             answer_result = AnswerResult()
             answer_result.history = history
