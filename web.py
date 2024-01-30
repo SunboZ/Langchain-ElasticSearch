@@ -49,7 +49,7 @@ def predict(question, search_method, top_k, max_token, temperature, top_p, knn_b
     for i in search_res:
         informed_context += i['content'] + '\n'
     prompt = PROMPT_TEMPLATE.replace("{question}", question).replace("{context}", informed_context)
-    for answer_result in llm.generatorAnswer(prompt=prompt, history=history, streaming=False):
+    for answer_result in llm.generatorAnswer(prompt=prompt, history=history, streaming=True):
         history = answer_result.history
         history[-1][0] = question
         yield history, history, search_result, ""
