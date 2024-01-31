@@ -5,6 +5,7 @@ from transformers import AutoModel, AutoTokenizer, AutoModelForCausalLM
 from langchain.llms.base import LLM
 from model.base import AnswerResult
 from configs.params import ModelParams
+from llama_cpp import Llama
 
 model_config = ModelParams()
 
@@ -42,6 +43,14 @@ class ChatLLM(LLM):
                                                          trust_remote_code=True).cuda()
             self.model.eval()
             self.model_type = "Qwen"
+        elif ".gguf" in self.model_path.lower():
+            self.model = Llama(
+                model_path=self.model_path,
+                chat_format="llama-2",
+                n_gpu_layers=-1,
+                n_ctx=1024
+            )
+            self.model_type = "gguf"
         else:
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_path, trust_remote_code=True)
             self.model = AutoModel.from_pretrained(self.model_path, trust_remote_code=True).cuda()
@@ -93,15 +102,27 @@ class ChatLLM(LLM):
                 answer_result.llm_output = {"answer": stream_resp}
                 yield answer_result
         else:
-            response, _ = self.model.chat(
-                self.tokenizer,
-                prompt,
-                history=history[-self.history_len:] if self.history_len > 0 else [],
-                max_length=self.max_token,
-                temperature=self.temperature,
-                top_p=self.top_p
-            )
-            # self.clear_torch_cache()
+            input_history = []
+            temp_history = history[-self.history_len:] if self.history_len > 0 else []
+            for item in temp_history:
+                input_history.append({"role": "user", "content": item[0]})
+                input_history.append({"role": "assistant", "content": item[1]})
+                
+            if self.model_type == "gguf":
+                message = {"role": "user", "content": prompt}
+                input_history.append(message)
+                res = self.model.create_chat_completion(messages=input_history)
+                response = res.get("choices")[-1].get("message").get("content").split("<|im_end|>")[0].strip()
+            else:
+                response, _ = self.model.chat(
+                    self.tokenizer,
+                    prompt,
+                    history=input_history,
+                    max_length=self.max_token,
+                    temperature=self.temperature,
+                    top_p=self.top_p
+                )
+                # self.clear_torch_cache()
             history += [[prompt, response]]
             answer_result = AnswerResult()
             answer_result.history = history
