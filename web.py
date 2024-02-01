@@ -4,10 +4,10 @@ from doc_search import ES
 from model.chatglm_llm import ChatLLM
 from configs.params import ModelParams
 
-# PROMPT_TEMPLATE = """已知信息：
-# {context} 
+PROMPT_TEMPLATE = """已知信息：
+{context} 
 
-# 根据上述已知信息，简洁和专业的来回答用户的问题。答案请使用中文。 问题是：{question}"""s
+根据上述已知信息，简洁和专业的来回答用户的问题。答案请使用中文。 问题是：{question}"""
 
 model_config = ModelParams()
 es = ES(model_config.embedding_model)
@@ -48,8 +48,8 @@ def predict(question, search_method, top_k, max_token, temperature, top_p, knn_b
     informed_context = ''
     for i in search_res:
         informed_context += i['content'] + '\n'
-    # prompt = PROMPT_TEMPLATE.replace("{question}", question).replace("{context}", informed_context)
-    prompt = question
+    prompt = PROMPT_TEMPLATE.replace("{question}", question).replace("{context}", informed_context)
+    # prompt = question
     for answer_result in llm.generatorAnswer(prompt=prompt, history=history, streaming=False):
         history = answer_result.history
         history[-1][0] = question
