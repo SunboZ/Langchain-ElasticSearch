@@ -112,4 +112,4 @@ if __name__ == "__main__":
 
         emptyBtn.click(fn=clear_session, inputs=[], outputs=[chatbot, history, search_out], queue=False)
 
-    demo.queue().launch(share=False, inbrowser=False, server_name="0.0.0.0", server_port=8000)
+    demo.launch(share=True, server_name="0.0.0.0", server_port=8000)
